@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+#je crée une liste de couleurs pour les douze lettres ainsi que pour les obstacles
 l_col=np.zeros((13,3))
 l_col[0]=(255,255,255)
 l_col[1]=(173,20,87)
@@ -21,6 +23,7 @@ test=[[3,3,6,6,7,5,5,5,11,11,11,11],[3,6,6,6,7,9,5,5,10,11,12,12],[3,1,6,7,7,9,9
 print(np.shape(test))
 
 def visu(pp):
+    # en argument je prends la pretty print réalisée précédemment qui est de la forme de la matrice test ci-dessus
     l_col={}
     l_col[-1]=(255,255,255)
     l_col[1]=(173,20,87)
@@ -41,12 +44,13 @@ def visu(pp):
     x= x0*10 
     y = y0*10 
     tab= np.zeros((y,x,3), dtype=np.uint8)
-    # je crée la grille 
+    # je crée la grille de visulisation en multpipliant par 10 les pixels pour avoir une plus grande liberté.
     tab[:,:,:] = 255
+    # j'initialise mes pixels en blanc
     for i in range(x0):
         for j in range(y0):
-            tab[j*10:(j+1)*10,i*10:(i+1)*10]=l_col[int(test[j][i])]
-            #je remplis ma grille
+            tab[j*10:(j+1)*10,i*10:(i+1)*10]=l_col[int(pp[j][i])]
+            #je remplis ma grille en remplissant carré par carré (de 10x10) par la couleur associée à la lettre
     plt.imshow(tab)
     plt.show()
 
