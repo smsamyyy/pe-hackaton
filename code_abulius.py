@@ -43,34 +43,6 @@ X[0,1],X[1,0:3],X[2,1] = 1,1,1
 #certaines colonnes/lignes sont vides. On regarde celles qui
 #nous intéressent
 
-def maxlig(piece):
-    vecteur = np.sum(piece,axis=1)
-    fin = len(vecteur)
-    for i in range(fin):
-        if vecteur[fin-i-1] >= 1.:
-            return fin-i-1
-    return fin-1
-
-def maxcol(piece):
-    vecteur = np.sum(piece,axis=0)
-    fin = len(vecteur)
-    for i in range(fin):
-        if vecteur[fin-i-1] >= 1.:
-            return fin-i-1
-    return fin-1
-
-#on encode l'opération de symétrie
-
-def sym(piece) : 
-    indices_lignes_non_nulles = ~np.all(piece == 0, axis=1)
-    indices_colonnes_non_nulles = ~np.all(piece == 0, axis=0)
-    piece_sans_zeros = piece[indices_lignes_non_nulles][:, indices_colonnes_non_nulles]     # Sélectionner les lignes et colonnes non nulles
-    piece_reflechie = np.fliplr(piece)
-    piece_int = vierge+piece_reflechie
-    nombre_de_colonnes_avec_que_des_zeros = np.sum(np.all(piece_int == 0, axis=0)) 
-    piece_bis = np.roll(piece_int, shift=-nombre_de_colonnes_avec_que_des_zeros, axis=1)
-    return piece_bis
-
 #on numérote chaque case, en sotant les obstacles
 def numgrille(grille):
     compte = 0
