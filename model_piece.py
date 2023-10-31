@@ -71,7 +71,7 @@ def sym(piece) :
     piece_bis = np.roll(piece_int, shift=-nombre_de_colonnes_avec_que_des_zeros, axis=1)
     return piece_bis
 
-
+#on numérote chaque case, en sotant les obstacles
 def numgrille(grille):
     compte = 0
     m,n = grille.shape
@@ -83,7 +83,8 @@ def numgrille(grille):
                 compte+=1
     return grillebis
 
-
+#avec une pièce et un morceau de notre grille, on regarde s'il n'y a pas
+#d'obstacle qui gènent
 def pasdecollison(A,B):
     m,n = A.shape
     for i in range(m):
@@ -92,6 +93,8 @@ def pasdecollison(A,B):
                 return False
     return True
 
+
+#on construit le vecteur qui encode une position possible de la pièce
 def attrib(grillebis,p,i,j,largeur,hauteur,m,n):
     vecteur = [0]*(grille[-1:-1]+1)
     for k in range(largeur):
@@ -99,7 +102,8 @@ def attrib(grillebis,p,i,j,largeur,hauteur,m,n):
             vecteur[i+k,j+l] = p[k,l]
     return vecteur
 
-
+#on encode la fonction qui détermine l'ensemble des positions possibles
+#pour une pièce donnée à une orientation donnée
 def test(grille,piece):
     largeur = maxcol(piece)
     hauteur = maxlig(piece)
