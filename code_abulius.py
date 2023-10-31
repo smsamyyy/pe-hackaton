@@ -1,4 +1,5 @@
 import numpy as np 
+from code_smail import *
 
 vierge = np.zeros((5,5))
 
@@ -67,7 +68,7 @@ def pasdecollison(A,B):
 
 
 #on construit le vecteur qui encode une position possible de la pièce
-def attrib(grillebis,p,i,j,largeur,hauteur,m,n):
+def attrib(grille,p,i,j,largeur,hauteur,m,n):
     vecteur = [0]*(grille[-1:-1]+1)
     for k in range(largeur):
         for l in range(hauteur):
