@@ -2,9 +2,10 @@ import numpy as np
 
 vierge = np.zeros((5,5))
 
+#on crée les différentes pièces
+
 F = vierge.copy()
 F[0:3,1],F[1,0],F[0,2] = 1,1,1
-
 
 I = vierge.copy()
 I[:,0] = 1
@@ -39,6 +40,9 @@ Y[0,1],Y[1,0:2],Y[2,1],Y[3,1] = 1,1,1,1
 X = vierge.copy()
 X[0,1],X[1,0:3],X[2,1] = 1,1,1
 
+#certaines colonnes/lignes sont vides. On regarde celles qui
+#nous intéressent
+
 def maxlig(piece):
     vecteur = np.sum(piece,axis=1)
     fin = len(vecteur)
@@ -55,6 +59,8 @@ def maxcol(piece):
             return fin-i-1
     return fin-1
 
+#on encode l'opération de symétrie
+
 def sym(piece) : 
     indices_lignes_non_nulles = ~np.all(piece == 0, axis=1)
     indices_colonnes_non_nulles = ~np.all(piece == 0, axis=0)
@@ -65,7 +71,7 @@ def sym(piece) :
     piece_bis = np.roll(piece_int, shift=-nombre_de_colonnes_avec_que_des_zeros, axis=1)
     return piece_bis
 
-
+#on numérote chaque case, en sotant les obstacles
 def numgrille(grille):
     compte = 0
     m,n = grille.shape
@@ -77,7 +83,8 @@ def numgrille(grille):
                 compte+=1
     return grillebis
 
-
+#avec une pièce et un morceau de notre grille, on regarde s'il n'y a pas
+#d'obstacle qui gènent
 def pasdecollison(A,B):
     m,n = A.shape
     for i in range(m):
@@ -86,6 +93,8 @@ def pasdecollison(A,B):
                 return False
     return True
 
+
+#on construit le vecteur qui encode une position possible de la pièce
 def attrib(grillebis,p,i,j,largeur,hauteur,m,n):
     vecteur = [0]*(grille[-1:-1]+1)
     for k in range(largeur):
@@ -93,8 +102,11 @@ def attrib(grillebis,p,i,j,largeur,hauteur,m,n):
             vecteur[i+k,j+l] = p[k,l]
     return vecteur
 
-
+#on encode la fonction qui détermine l'ensemble des positions possibles
+#pour une pièce donnée à une orientation donnée
 def test(grille,piece):
+    largeur = maxcol(piece)
+    hauteur = maxlig(piece)
     p = piece.copy()
     p = p[0:largeur,0:hauteur]
     a,b = grille.shape
