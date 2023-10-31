@@ -1,4 +1,5 @@
 import numpy as np 
+from code_smail import *
 
 vierge = np.zeros((5,5))
 
@@ -65,9 +66,26 @@ def pasdecollison(A,B):
                 return False
     return True
 
+def maxlig(piece):
+    vecteur = np.sum(piece,axis=1)
+    fin = len(vecteur)
+    for i in range(fin):
+        if vecteur[fin-i-1] >= 1.:
+            return fin-i-1
+    return fin-1
+
+def maxcol(piece):
+    vecteur = np.sum(piece,axis=0)
+    fin = len(vecteur)
+    for i in range(fin):
+        if vecteur[fin-i-1] >= 1.:
+            return fin-i-1
+    return fin-1
+
+
 
 #on construit le vecteur qui encode une position possible de la pièce
-def attrib(grillebis,p,i,j,largeur,hauteur,m,n):
+def attrib(grille,p,i,j,largeur,hauteur,m,n):
     vecteur = [0]*(grille[-1:-1]+1)
     for k in range(largeur):
         for l in range(hauteur):
@@ -86,7 +104,7 @@ def test(grille,piece):
     for i in range(a-largeur+1):
         for j in range(b-hauteur+1):
             if pasdecollison(p,grille[i:i+largeur+1,j:j+hauteur+1]):
-                vecteur = atrib(grillebis,p,i,j,largeur,hauteur,m,n)
+                vecteur = attrib(grille,p,i,j,largeur,hauteur,a,b)
 
                 index = [0 for i in range(12)] 
                 index[association(piece)] = 1
