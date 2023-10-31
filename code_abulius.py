@@ -65,6 +65,23 @@ def pasdecollison(A,B):
                 return False
     return True
 
+def maxlig(piece):
+    vecteur = np.sum(piece,axis=1)
+    fin = len(vecteur)
+    for i in range(fin):
+        if vecteur[fin-i-1] >= 1.:
+            return fin-i-1
+    return fin-1
+
+def maxcol(piece):
+    vecteur = np.sum(piece,axis=0)
+    fin = len(vecteur)
+    for i in range(fin):
+        if vecteur[fin-i-1] >= 1.:
+            return fin-i-1
+    return fin-1
+
+
 
 #on construit le vecteur qui encode une position possible de la pièce
 def attrib(grillebis,p,i,j,largeur,hauteur,m,n):
