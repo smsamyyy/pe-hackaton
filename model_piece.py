@@ -2,9 +2,10 @@ import numpy as np
 
 vierge = np.zeros((5,5))
 
+#on crée les différentes pièces
+
 F = vierge.copy()
 F[0:3,1],F[1,0],F[0,2] = 1,1,1
-
 
 I = vierge.copy()
 I[:,0] = 1
@@ -39,6 +40,9 @@ Y[0,1],Y[1,0:2],Y[2,1],Y[3,1] = 1,1,1,1
 X = vierge.copy()
 X[0,1],X[1,0:3],X[2,1] = 1,1,1
 
+#certaines colonnes/lignes sont vides. On regarde celles qui
+#nous intéressent
+
 def maxlig(piece):
     vecteur = np.sum(piece,axis=1)
     fin = len(vecteur)
@@ -54,6 +58,8 @@ def maxcol(piece):
         if vecteur[fin-i-1] >= 1.:
             return fin-i-1
     return fin-1
+
+#on encode l'opération de symétrie
 
 def sym(piece) : 
     indices_lignes_non_nulles = ~np.all(piece == 0, axis=1)
@@ -95,6 +101,8 @@ def attrib(grillebis,p,i,j,largeur,hauteur,m,n):
 
 
 def test(grille,piece):
+    largeur = maxcol(piece)
+    hauteur = maxlig(piece)
     p = piece.copy()
     p = p[0:largeur,0:hauteur]
     a,b = grille.shape
