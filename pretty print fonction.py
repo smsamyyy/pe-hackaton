@@ -31,3 +31,6 @@ def pretty_print(resu_cover):
     for cpt in range(60):
         pretty_print[i,j] = sol[0,cpt]
         i,j = suivant(i,j)
+    
+
+    return pretty_print
