@@ -124,4 +124,3 @@ def test(grille,piece):
     
 
 
-
