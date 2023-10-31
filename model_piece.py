@@ -40,6 +40,12 @@ Y[0,1],Y[1,0:2],Y[2,1],Y[3,1] = 1,1,1,1
 X = vierge.copy()
 X[0,1],X[1,0:3],X[2,1] = 1,1,1
 
+def association(lettre) :
+    Liste = [F,I,L,N,P,T,U,V,W,X,Y,Z]
+    if lettre in Liste :
+        position = Liste.index(lettre)
+        return position
+
 #certaines colonnes/lignes sont vides. On regarde celles qui
 #nous intéressent
 
@@ -72,6 +78,8 @@ def sym(piece) :
     return piece_bis
 
 
+#on numérote chaque case, en sotant les obstacles
+
 def numgrille(grille):
     compte = 0
     m,n = grille.shape
@@ -83,6 +91,8 @@ def numgrille(grille):
                 compte+=1
     return grillebis
 
+#avec une pièce et un morceau de notre grille, on regarde s'il n'y a pas
+#d'obstacle qui gènent
 
 def pasdecollison(A,B):
     m,n = A.shape
@@ -92,6 +102,8 @@ def pasdecollison(A,B):
                 return False
     return True
 
+#on construit le vecteur qui encode une position possible de la pièce
+
 def attrib(grillebis,p,i,j,largeur,hauteur,m,n):
     vecteur = [0]*(grille[-1:-1]+1)
     for k in range(largeur):
@@ -99,6 +111,8 @@ def attrib(grillebis,p,i,j,largeur,hauteur,m,n):
             vecteur[i+k,j+l] = p[k,l]
     return vecteur
 
+#on encode la fonction qui détermine l'ensemble des positions possibles
+#pour une pièce donnée à une orientation donnée
 
 def test(grille,piece):
     largeur = maxcol(piece)
