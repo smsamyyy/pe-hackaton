@@ -15,7 +15,7 @@ def pretty_print(resu_cover):
         nb = 0 
         while line[nb] == 0:
             nb+=1
-        sol = sol + nb*line[12:]
+        sol = sol + (nb+1)*line[12:]
 
     def suivant(i,j): #pour trouver la case suivange qui ne soit pas un obstacle
         x,y = grille.shape
