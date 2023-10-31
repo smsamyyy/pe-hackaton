@@ -50,4 +50,4 @@ def visu(pp):
     plt.imshow(tab)
     plt.show()
 
-visu(test)
+#visu(test)
