@@ -1,11 +1,12 @@
 import numpy as np
+import exact_cover as ec
 
-
-#grille est un evariable globale
+#grille est une variable globale
 
 
 grille = np.zeros((5,12))
 
+#resu_cover = ec.get_exact_cover()
 
 def pretty_print(resu_cover):
     sol = np.zeros((1,60))
