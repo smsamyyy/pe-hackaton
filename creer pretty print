@@ -1,0 +1,63 @@
+import numpy as np
+
+#On se donne un tableau tab avec des 0 pour les obstacles et on va mettre le pretty print dedans
+
+grille = np.zeros((5,12))
+
+#on se donne une liste de liste qui donne le resultat de exact cover
+
+#resu_cover = np.zeros((12,72))
+
+
+#je cree une variable ex qui est un exemple de ce que pourrait renvoyer exact_cover avec une grille 6*10
+ex = np.zeros((12,72))
+for cpt in range(12):
+    ex[cpt,cpt]=1
+ex[0,12:17]=(1,1,1,1,1)
+ex[1,17:22]=(1,1,1,1,1)
+ex[2,22:27]=(1,1,1,1,1)
+ex[3,27:32]=(1,1,1,1,1)
+ex[4,32:37]=(1,1,1,1,1)
+ex[5,37:42]=(1,1,1,1,1)
+ex[6,42:47]=(1,1,1,1,1)
+ex[7,47:52]=(1,1,1,1,1)
+ex[8,52:57]=(1,1,1,1,1)
+ex[9,57:62]=(1,1,1,1,1)
+ex[10,62:67]=(1,1,1,1,1)
+ex[11,67:72]=(1,1,1,1,1)
+
+resu_cover = ex
+
+sol = np.zeros((1,60))
+
+for i in range(12):
+    line = resu_cover[i,:]
+    nb = 0 
+    while line[nb] == 0:
+        nb+=1
+    sol = sol + nb*line[12:]
+
+# maintenant sol contient des numeros differents par piece
+
+# il faut remettre linformation lineaire dans grille
+
+def suivant(i,j): #pour trouver la case suivange qui ne soit pas un obstacle
+    x,y = grille.shape
+    i2,j2 = i,j+1
+    if j2>=y:
+        return (i2+1,0)
+    if grille[i2,j2] == -1:
+        return suivant(i2,j2+1)
+    return (i2,j2)
+
+#print(sol)
+
+#sol2 = np.array([[3,3,6,7,7,5,5,5,11,11,11,11,3,6,6,6,7,9,5,5,10,11,12,12,3,1,6,7,7,9,9,10,10,10,12,8,3,1,1,4,4,4,9,9,10,12,12,8,1,1,4,4,2,2,2,2,2,8,8,8]])
+
+(i,j) = suivant(0,-1)
+pretty_print = grille.copy()
+for cpt in range(60):
+    pretty_print[i,j] = sol[0,cpt]
+    i,j = suivant(i,j)
+
+print(pretty_print)
