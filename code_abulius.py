@@ -104,7 +104,7 @@ def test(grille,piece):
     for i in range(a-largeur+1):
         for j in range(b-hauteur+1):
             if pasdecollison(p,grille[i:i+largeur+1,j:j+hauteur+1]):
-                vecteur = atrib(grillebis,p,i,j,largeur,hauteur,m,n)
+                vecteur = attrib(grille,p,i,j,largeur,hauteur,a,b)
 
                 index = [0 for i in range(12)] 
                 index[association(piece)] = 1
