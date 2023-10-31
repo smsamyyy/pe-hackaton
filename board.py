@@ -1,5 +1,5 @@
 import numpy as np
-
+#on crée ici un dictionnaire des grille à tester. Un 1 signifie que la case est à remplir. Un -1 correspond à un obstacle.
 bo={}
 
 bo['b5X12']= np.ones((5,12))
