@@ -1,0 +1,363 @@
+#On a choisi le TP1 pentominoes - Samy SMAIL - David ABULIUS - Benoît VOGEL - Matti COMBA
+#Voici la concaténation de chacune de nos parties (les codes individuels sont mis dans des les parties nommées code_prénom)
+#Le TP n'a pas été complètement fini, mais on mettra en commentaires les idées que l'on avait eues pour faire fonctionner le tout
+
+import numpy as np
+import exact_cover as ec
+import matplotlib.pyplot as plt
+
+#code_smail
+
+vierge = np.zeros((5,5))
+
+#On définit les pièces comme une suite de 0 et de 1 dans une matrice de taille 5*5
+F = vierge.copy()
+F[0:3,1],F[1,0],F[0,2] = 1,1,1
+
+
+I = vierge.copy()
+I[:,0] = 1
+
+L = vierge.copy()
+L[0:4,0],L[3,1] = 1,1
+
+N = vierge.copy()
+N[2:4,0],N[0:3,1] = 1,1
+
+P = vierge.copy()
+P[0:3,0],P[0:2,1] = 1,1
+
+T = vierge.copy()
+T[0,:],T[0:3,1] = 1,1
+
+U = vierge.copy()
+U[1,:],U[0,0],U[0,2] = 1,1,1
+
+V = vierge.copy()
+V[0:3,0],V[2,0:3] = 1,1
+
+W = vierge.copy()
+W[0:2,0],W[1:3,1],W[2:3,2] = 1,1,1
+
+X = vierge.copy()
+X[0,1],X[1,0:3],X[2,1] = 1,1,1
+
+Y = vierge.copy()
+Y[0,1],Y[1,0:2],Y[2,1],Y[3,1] = 1,1,1,1
+
+Z = vierge.copy()
+Z[0,0:2], Z[1,1], Z[2,1:3] = 1,1,1
+
+#print(F,I,L,N,P,T,U,V,W,X,Y,Z)
+
+
+
+#On définit une fonction rotation de pièce -> effectue une rotation de pi/2 dans le sens horaire
+#r est d'ordre 4 : r^4 = e
+def rot(piece): #rotation de 90°
+    lignes, colonnes = piece.shape
+    
+    pieceretournee = np.zeros((colonnes, lignes), dtype=piece.dtype) 
+
+    for i in range(lignes): #on effectue la rotation
+        for j in range(colonnes):
+            pieceretournee[j, lignes - 1 - i] = piece[i, j]
+    
+    #on souhaite effectuer un décalage vers la gauche du nombre de colonnes contenant 0 pour retrouver la pièce en haut à gauche
+    nombre_de_colonnes_avec_que_des_zeros = np.sum(np.all(pieceretournee == 0, axis=0)) 
+    matrice_decalage = np.roll(pieceretournee, shift=-nombre_de_colonnes_avec_que_des_zeros, axis=1)
+    return matrice_decalage
+
+#print(rot(P))
+
+#On définit maintenant une fonction symétrie -> effectue la réflexion selon un axe vertical. 
+#La réflexion selon l'axe horizontal revient juste à rotation*réflexion*rotation
+#La symétrie s est d'ordre 2 --> s² = e
+def sym(piece) : 
+    indices_lignes_non_nulles = ~np.all(piece == 0, axis=1)   
+    indices_colonnes_non_nulles = ~np.all(piece == 0, axis=0)
+    piece_sans_zeros = piece[indices_lignes_non_nulles][:, indices_colonnes_non_nulles]     
+# On prend la matrice contenant uniquement la pièce, sans les lignes et colonnes nulles
+    piece_reflechie = np.fliplr(piece) #on effectue la réflexion
+    piece_int = vierge+piece_reflechie #on réinjecte dans une matrice 5*5
+    nombre_de_colonnes_avec_que_des_zeros = np.sum(np.all(piece_int == 0, axis=0)) 
+    piece_bis = np.roll(piece_int, shift=-nombre_de_colonnes_avec_que_des_zeros, axis=1) #on a recadré en haut à gauche
+    return piece_bis
+
+#print(sym(P))
+#Fonction qui renvoie la position de la lettre 
+def association(lettre) :
+    Liste = [F,I,L,N,P,T,U,V,W,X,Y,Z]
+    if lettre in Liste :
+        position = Liste.index(lettre)
+        return position
+
+#Maintenant, on souhaite avoir un dictionnaire avec en clefs les lettres (figures), en valeurs les différentes dispositions possibles
+#Pour ça, on teste d'abord l'ensemble généré par les rotations. Pour chaque lettre (une par une) : 
+#On "applique" r la rotation 1 fois, si c'est la même figure, on s'arrête
+#Sinon, on l'ajoute en tant que value de la lettre initiale et on réitère (jusqu'à 3 itérations car r est d'ordre 4 : r^4 = id)
+#On applique ensuite s une fois à la première figure, si le symétrique == la figure, rien ne se passe, sinon on effectue une symétrie
+#pour chacun des éléments de la liste de la lettre
+
+
+#code_abulius
+##grille
+
+
+#certaines colonnes/lignes sont vides. On regarde celles qui
+#nous intéressent
+
+#on numérote chaque case, en sautant les obstacles
+def numgrille(grille):
+    compte = 0
+    m,n = grille.shape
+    grillebis = -1*np.ones((m,n))
+    for i in range(m):
+        for j in range(n):
+            if grille[i,j] == 0:
+                grillebis[i,j] = compte
+                compte+=1
+    return grillebis
+
+#avec une pièce et un morceau de notre grille, on regarde s'il n'y a pas
+#d'obstacle qui gène
+def pasdecollison(A,B):
+    m,n = A.shape
+    for i in range(m):
+        for j in range(n):
+            if A[i,j] == 1 and B[i,j] == -1 :
+                return False
+    return True
+
+def maxlig(piece):
+    vecteur = np.sum(piece,axis=1)
+    fin = len(vecteur)
+    for i in range(fin):
+        if vecteur[fin-i-1] >= 1.:
+            return fin-i-1
+    return fin-1
+
+def maxcol(piece):
+    vecteur = np.sum(piece,axis=0)
+    fin = len(vecteur)
+    for i in range(fin):
+        if vecteur[fin-i-1] >= 1.:
+            return fin-i-1
+    return fin-1
+
+
+
+#on construit le vecteur qui encode une position possible de la pièce
+def attrib(grille,p,i,j,largeur,hauteur,m,n):
+    vecteur = [0]*(grille[-1:-1]+1)
+    for k in range(largeur):
+        for l in range(hauteur):
+            vecteur[i+k,j+l] = p[k,l]
+    return vecteur
+
+#on encode la fonction qui détermine l'ensemble des positions possibles
+#pour une pièce donnée à une orientation donnée
+def test(grille,piece):
+    largeur = maxcol(piece)
+    hauteur = maxlig(piece)
+    p = piece.copy()
+    p = p[0:largeur,0:hauteur]
+    a,b = grille.shape
+    total = []
+    for i in range(a-largeur+1):
+        for j in range(b-hauteur+1):
+            if pasdecollison(p,grille[i:i+largeur+1,j:j+hauteur+1]):
+                vecteur = attrib(grille,p,i,j,largeur,hauteur,a,b)
+
+                index = [0 for i in range(12)] 
+                index[association(piece)] = 1
+
+                total.append([index,vecteur])
+    return total
+
+
+
+
+
+
+
+#code_vogel
+#grille est une variable globale
+
+
+grille = np.zeros((5,12))
+#resu_cover = ec.get_exact_cover(ce qui est donné par le programme d'avant)
+
+
+# Le but de cette fonction est d'utiliser le résultat de l'algorithme déja implémenté pour représenter
+# la position des pièces dans la grille
+def pretty_print(resu_cover):
+    sol = np.zeros((1,60)) # cette variable va recevoir des numeros differents avec un numero par piece.
+    # Le codage est en ligne et il faudra ensuite la remettre dans le tableau
+
+    for i in range(12): # boucle for pour identifier quelle pièce c'est
+        line = resu_cover[i,:]
+        nb = 0 
+        while line[nb] == 0:
+            nb+=1
+        sol = sol + (nb+1)*line[12:]
+
+    def suivant(i,j): #pour trouver la case suivante qui ne soit pas un obstacle et qui soit bien dans la grille
+        x,y = grille.shape
+        i2,j2 = i,j+1
+        if j2>=y:
+            return (i2+1,0)
+        if grille[i2,j2] == -1:
+            return suivant(i2,j2+1)
+        return (i2,j2)
+
+    (i,j) = suivant(0,-1)
+    pretty_print = grille.copy()
+    for cpt in range(60): #boucle for pour recompactifier l'information de sol dans la grille
+        pretty_print[i,j] = sol[0,cpt]
+        i,j = suivant(i,j)
+    
+
+    return pretty_print #le type de cette variable est un array a 2 dimensions
+
+
+#on se donne une liste de liste qui donne le resultat de exact cover
+
+#resu_cover = np.zeros((12,72))
+
+
+
+
+
+#creer pretty print
+#je cree une variable ex qui est un exemple de ce que pourrait renvoyer exact_cover avec une grille 6*10
+ex = np.zeros((12,72))
+for cpt in range(12):
+    ex[cpt,cpt]=1
+ex[0,12:17]=(1,1,1,1,1)
+ex[1,17:22]=(1,1,1,1,1)
+ex[2,22:27]=(1,1,1,1,1)
+ex[3,27:32]=(1,1,1,1,1)
+ex[4,32:37]=(1,1,1,1,1)
+ex[5,37:42]=(1,1,1,1,1)
+ex[6,42:47]=(1,1,1,1,1)
+ex[7,47:52]=(1,1,1,1,1)
+ex[8,52:57]=(1,1,1,1,1)
+ex[9,57:62]=(1,1,1,1,1)
+ex[10,62:67]=(1,1,1,1,1)
+ex[11,67:72]=(1,1,1,1,1)
+
+resu_cover = ex
+
+sol = np.zeros((1,60))
+
+for i in range(12):
+    line = resu_cover[i,:]
+    nb = 0 
+    while line[nb] == 0:
+        nb+=1
+    sol = sol + nb*line[12:]
+
+# maintenant sol contient des numeros differents par piece
+
+# il faut remettre linformation lineaire dans grille
+
+def suivant(i,j): #pour trouver la case suivange qui ne soit pas un obstacle
+    x,y = grille.shape
+    i2,j2 = i,j+1
+    if j2>=y:
+        return (i2+1,0)
+    if grille[i2,j2] == -1:
+        return suivant(i2,j2+1)
+    return (i2,j2)
+
+#print(sol)
+
+#sol2 = np.array([[3,3,6,7,7,5,5,5,11,11,11,11,3,6,6,6,7,9,5,5,10,11,12,12,3,1,6,7,7,9,9,10,10,10,12,8,3,1,1,4,4,4,9,9,10,12,12,8,1,1,4,4,2,2,2,2,2,8,8,8]])
+
+(i,j) = suivant(0,-1)
+pretty_print = grille.copy()
+for cpt in range(60):
+    pretty_print[i,j] = sol[0,cpt]
+    i,j = suivant(i,j)
+
+print(pretty_print)
+
+
+
+
+
+
+##board
+#on crée ici un dictionnaire des grille à tester. Un 1 signifie que la case est à remplir. Un -1 correspond à un obstacle.
+bo={}
+
+bo['b5X12']= np.ones((5,12))
+bo['b6X10']= np.ones((6,10))
+bo['b4X15']= np.ones((4,15))
+bo['b3X20']= np.ones((3,20))
+m= np.ones((8,8))
+m[4,4]=-1
+m[4,3]=-1
+m[3,4]=-1
+m[3,3]=-1
+print(m)
+bo['b8X8_obst_2X2mid'] = m
+bo['2xb5X6']= np.array([np.ones((5,6)),np.ones((5,6))])
+print(bo['2xb5X6'])
+
+
+#interface graphe
+#je crée une liste de couleurs pour les douze lettres ainsi que pour les obstacles
+l_col=np.zeros((13,3))
+l_col[0]=(255,255,255)
+l_col[1]=(173,20,87)
+l_col[2]=(224,64,251)
+l_col[3]=(101,31,255)
+l_col[4]=(121,134,203)
+l_col[5]=(33,150,243)
+l_col[6]=(0,188,212)
+l_col[7]=(29,233,182)
+l_col[8]=(27,94,32)
+l_col[9]=(238,255,65)
+l_col[10]=(245,127,23)
+l_col[11]=(109,76,65)
+l_col[12]=(229,115,115)
+
+
+test=[[3,3,6,6,7,5,5,5,11,11,11,11],[3,6,6,6,7,9,5,5,10,11,12,12],[3,1,6,7,7,9,9,10,10,10,12,8],[3,1,1,4,4,4,9,9,10,12,12,8],[1,1,4,4,2,2,2,2,2,8,8,8]]
+print(np.shape(test))
+
+def visu(pp):
+    # en argument je prends la pretty print réalisée précédemment qui est de la forme de la matrice test ci-dessus
+    l_col={}
+    l_col[-1]=(255,255,255)
+    l_col[1]=(173,20,87)
+    l_col[2]=(224,64,251)
+    l_col[3]=(101,31,255)
+    l_col[4]=(121,134,203)
+    l_col[5]=(33,150,243)
+    l_col[6]=(0,188,212)
+    l_col[7]=(29,233,182)
+    l_col[8]=(27,94,32)
+    l_col[9]=(238,255,65)
+    l_col[10]=(245,127,23)
+    l_col[11]=(109,76,65)
+    l_col[12]=(229,115,115)
+    # je crée ma liste de couleurs
+    x0=np.shape(pp)[1]
+    y0=np.shape(pp)[0]
+    x= x0*10 
+    y = y0*10 
+    tab= np.zeros((y,x,3), dtype=np.uint8)
+    # je crée la grille de visulisation en multpipliant par 10 les pixels pour avoir une plus grande liberté.
+    tab[:,:,:] = 255
+    # j'initialise mes pixels en blanc
+    for i in range(x0):
+        for j in range(y0):
+            tab[j*10:(j+1)*10,i*10:(i+1)*10]=l_col[int(pp[j][i])]
+            #je remplis ma grille en remplissant carré par carré (de 10x10) par la couleur associée à la lettre
+    plt.imshow(tab)
+    plt.show()
+
+#visu(test)

@@ -79,11 +79,34 @@ def sym(piece) :
 
 #print(sym(P))
 
+Liste = [F,I,L,N,P,T,U,V,W,X,Y,Z]
+
 #Fonction qui renvoie la position de la lettre 
 def association(lettre) :
-    Liste = [F,I,L,N,P,T,U,V,W,X,Y,Z]
     if lettre in Liste :
         position = Liste.index(lettre)
         return position
 
 #print(association(F))
+
+#L'objectif maintenant est de créer une liste avec, pour chaque lettre, toutes ses différentes configurations possibles (sans répétitions).
+#Pour ça, on teste d'abord l'ensemble généré par les rotations : on "applique" r la rotation 1 fois, si c'est la même figure, on s'arrête
+#Sinon on continue (jusqu'à 3 itérations car r est d'ordre 4 : r^4 = id)
+#On applique ensuite s une fois à la première figure, si le symétrique == la figure, rien ne se passe, sinon on effectue une symétrie
+#pour tous les éléments de la liste de la lettre
+#Listes des pièces avec configurations 
+"""
+Lettres_config = [[]]
+
+for lettre in Liste :
+    n = Lettres_config.index(lettre)
+    Lettres_config[n].append(lettre)
+    for k in range (0,3) : 
+        if rot(lettre) != lettre :
+            Lettres_config[n].append(rot(lettre))
+        else : 
+            break
+
+
+print(Lettres_config)
+"""

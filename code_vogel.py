@@ -39,3 +39,5 @@ def pretty_print(resu_cover):
     
 
     return pretty_print #le type de cette variable est un array a 2 dimensions
+
+
